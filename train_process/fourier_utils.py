@@ -9,11 +9,11 @@ try:
 except ImportError:
     from torch.fft import irfft2
     from torch.fft import rfft2
-    def rfft(x, d):
-        t = rfft2(x, dim = (-d))
+    def rfft(x, signal_ndim):
+        t = rfft2(x, dim = (-signal_ndim))
         return torch.stack((t.real, t.imag), -1)
-    def irfft(x, d, signal_sizes):
-        return irfft2(torch.complex(x[:,:,0], x[:,:,1]), s = signal_sizes, dim = (-d))
+    def irfft(x, signal_ndim, signal_sizes):
+        return irfft2(torch.complex(x[:,:,0], x[:,:,1]), s = signal_sizes, dim = (-signal_ndim))
 
 def extract_ampl_phase(fft_im):
     # fft_im: size should be bx3xhxwx2
@@ -74,8 +74,8 @@ def FDA_source_to_target(src_img, trg_img, sigma=0.5):
     # input: src_img, trg_img
 
     # get fft of both source and target
-    fft_src = rfft( src_img.clone(), signal_ndim=2, onesided=False )
-    fft_trg = rfft( trg_img.clone(), signal_ndim=2, onesided=False )
+    fft_src = rfft( src_img.clone(), signal_ndim=2)
+    fft_trg = rfft( trg_img.clone(), signal_ndim=2)
 
     # extract amplitude and phase of both ffts
     amp_src, pha_src = extract_ampl_phase( fft_src.clone())
@@ -91,7 +91,7 @@ def FDA_source_to_target(src_img, trg_img, sigma=0.5):
 
     # get the recomposed image: source content, target style
     _, _, imgH, imgW = src_img.size()
-    src_in_trg = irfft( fft_src_, signal_ndim=2, onesided=False, signal_sizes=[imgH,imgW] )
+    src_in_trg = irfft( fft_src_, signal_ndim=2, signal_sizes=[imgH,imgW] )
 
     # recompose fft of source
     fft_trg_ = torch.zeros( fft_trg.size(), dtype=torch.float )
@@ -100,7 +100,7 @@ def FDA_source_to_target(src_img, trg_img, sigma=0.5):
 
     # get the recomposed image: source content, target style
     _, _, imgH, imgW = trg_img.size()
-    trg_in_src = irfft( fft_trg_, signal_ndim=2, onesided=False, signal_sizes=[imgH,imgW] )
+    trg_in_src = irfft( fft_trg_, signal_ndim=2, signal_sizes=[imgH,imgW] )
 
     return src_in_trg, trg_in_src
 
@@ -121,7 +121,7 @@ def FDA_source_to_target_np( src_img, trg_img, L=0.1 ):
 
     # mutate the amplitude part of source with target
     # amp_src_ = low_freq_mutate_np( amp_src, amp_trg, L=L )
-    amp_src_ = amplitude_mixed_np( amp_src, amp_trg, L=L )
+    amp_src_ = amplitude_mixed_np( amp_src, amp_trg, L)
 
     # mutated fft of source
     fft_src_ = amp_src_ * np.exp( 1j * pha_src )
@@ -134,7 +134,7 @@ def FDA_source_to_target_np( src_img, trg_img, L=0.1 ):
 
 
 def extract_fourier(img):
-    fft_src = rfft(img.clone(), signal_ndim=2, onesided=False)
+    fft_src = rfft(img.clone(), signal_ndim=2)
     amp_src, pha_src = extract_ampl_phase(fft_src.clone())
 
     return amp_src, pha_src
