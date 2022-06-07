@@ -1,19 +1,15 @@
-import os.path as osp
-import numpy as np
 import os
-import cv2
-from skimage import morphology
-import scipy
-from PIL import Image
-from matplotlib.pyplot import imsave
-# from keras.preprocessing import image
-from skimage.measure import label, regionprops
-from skimage.transform import rotate, resize
-from skimage import measure, draw
-import torch
-from skimage.morphology import disk, erosion, dilation, opening, closing, white_tophat
+import os.path as osp
 
 import matplotlib.pyplot as plt
+import numpy as np
+import scipy
+import torch
+from PIL import Image
+from matplotlib.pyplot import imsave
+from skimage import measure
+from skimage.measure import label, regionprops
+
 plt.switch_backend('agg')
 
 def get_largest_fillhole(binary):
