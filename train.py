@@ -24,9 +24,9 @@ def main():
     parser.add_argument('-g', '--gpu', type=int, default=0, help='gpu id')
     parser.add_argument('--resume', default=None, help='checkpoint path')
 
-    parser.add_argument('--datasetTrain', nargs='+', type=int, default=1, help='train folder id contain images ROIs to train range from [1,2,3,4]')
-    parser.add_argument('--datasetTest', nargs='+', type=int, default=3, help='test folder id contain images ROIs to test one of [1,2,3,4]')
-    parser.add_argument('--batch-size', type=int, default=8, help='batch size for training the model')
+    parser.add_argument('--datasetTrain', nargs='+', type=int, default=3, help='train folder id contain images ROIs to train range from [1,2,3,4]')
+    parser.add_argument('--datasetTest', nargs='+', type=int, default=2, help='test folder id contain images ROIs to test one of [1,2,3,4]')
+    parser.add_argument('--batch-size', type=int, default=1, help='batch size for training the model')
     parser.add_argument('--group-num', type=int, default=1, help='group number for group normalization')
     parser.add_argument('--max-epoch', type=int, default=80, help='max epoch')
     parser.add_argument('--stop-epoch', type=int, default=50, help='stop epoch')
