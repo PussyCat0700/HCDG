@@ -25,7 +25,7 @@ def main():
     parser.add_argument('--resume', default=None, help='checkpoint path')
 
     parser.add_argument('--datasetTrain', nargs='+', type=int, default=1, help='train folder id contain images ROIs to train range from [1,2,3,4]')
-    parser.add_argument('--datasetTest', nargs='+', type=int, default=1, help='test folder id contain images ROIs to test one of [1,2,3,4]')
+    parser.add_argument('--datasetTest', nargs='+', type=int, default=3, help='test folder id contain images ROIs to test one of [1,2,3,4]')
     parser.add_argument('--batch-size', type=int, default=8, help='batch size for training the model')
     parser.add_argument('--group-num', type=int, default=1, help='group number for group normalization')
     parser.add_argument('--max-epoch', type=int, default=80, help='max epoch')
@@ -33,13 +33,16 @@ def main():
     parser.add_argument('--interval-validate', type=int, default=2, help='interval epoch number to valide the model')
     parser.add_argument('--lr', type=float, default=1e-3, help='learning rate',)
     parser.add_argument('--lr-decrease-rate', type=float, default=0.2, help='ratio multiplied to initial lr')
-    parser.add_argument('--data-dir', default='./Dataset/Fundus/', help='data root path')
-    parser.add_argument('--pretrained-model', default='../../../models/pytorch/fcn16s_from_caffe.pth', help='pretrained model of FCN16s',)
+    parser.add_argument('--data-dir', default='D:\GitHubProjects\SFDA-DPL\Fundus', help='data root path')
     parser.add_argument('--out-stride', type=int, default=16, help='out-stride of deeplabv3+',)
     parser.add_argument('--gamma', type=int, default=200, help='weight of IC',)
     args = parser.parse_args()
 
     now = datetime.now()
+    if not isinstance(args.datasetTest, list):
+        args.datasetTest = [args.datasetTest]
+    if not isinstance(args.datasetTrain, list):
+        args.datasetTrain = [args.datasetTrain]
     args.out = osp.join(local_path, 'logs', 'test'+str(args.datasetTest[0]), now.strftime('%Y%m%d_%H%M%S.%f'))
     os.makedirs(args.out)
     with open(osp.join(args.out, 'config.yaml'), 'w') as f:
