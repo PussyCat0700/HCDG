@@ -115,9 +115,12 @@ class Trainer(object):
 
                 image = sample['image']
                 label = sample['label']
-
-                data = image.cuda()
-                target_map = label.cuda()
+                if self.cuda:
+                    data = image.cuda()
+                    target_map = label.cuda()
+                else:
+                    data = image
+                    target_map = label
 
                 with torch.no_grad():
                     predictions = self.S_model(data, classmates=False)
@@ -251,8 +254,11 @@ class Trainer(object):
                         for domain in trg_sample:
 
                             src_in_trg, trg_in_src = fourier_amplitude_mix(ori_img, domain['image'], L=1.0)
-                            aug_src = torch.cat([src_in_trg, trg_in_src], 0).cuda()
-                            aug_lab = torch.cat([lab, domain['label']], 0).cuda()
+                            aug_src = torch.cat([src_in_trg, trg_in_src], 0)
+                            aug_lab = torch.cat([lab, domain['label']], 0)
+                            if self.cuda:
+                                aug_src = aug_src.cuda()
+                                aug_lab = aug_lab.cuda()
                             sa = self.S_model(aug_src, classmates=False)
                             #ta = self.S_model(trg_in_src)
                             loss_sa = bceloss(torch.sigmoid(sa), aug_lab)
@@ -291,10 +297,13 @@ class Trainer(object):
 
 
             gamma = self.get_current_consistency_weight(self.epoch, self.gamma, 5)
-            image = image.cuda()
-            image_fs = image_fs.cuda()
-            target_map = label.cuda()
-            target_boundary = target_boundary.cuda()
+            if self.cuda:
+                image = image.cuda()
+                image_fs = image_fs.cuda()
+                target_map = label.cuda()
+                target_boundary = target_boundary.cuda()
+            else:
+                target_map = label
 
             so, bd, bn = self.S_model(image, classmates=True)
             sa = self.S_model(image_fs, classmates=False)

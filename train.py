@@ -2,7 +2,6 @@ from datetime import datetime
 import os
 import os.path as osp
 
-import torch
 from torchvision import transforms
 from torch.utils.data import DataLoader
 import argparse
@@ -12,7 +11,6 @@ from train_process import Trainer
 from dataloaders import fundus_dataloader as DL
 from dataloaders import custom_transforms as tr
 from networks.deeplabv3 import *
-from tqdm import tqdm
 
 local_path = osp.dirname(osp.abspath(__file__))
 
@@ -36,6 +34,7 @@ def main():
     parser.add_argument('--data-dir', default='D:\GitHubProjects\SFDA-DPL\Fundus', help='data root path')
     parser.add_argument('--out-stride', type=int, default=16, help='out-stride of deeplabv3+',)
     parser.add_argument('--gamma', type=int, default=200, help='weight of IC',)
+    parser.add_argument('--cuda', default=None, help='Enable Cuda')
     args = parser.parse_args()
 
     now = datetime.now()
@@ -49,7 +48,7 @@ def main():
         yaml.safe_dump(args.__dict__, f, default_flow_style=False)
 
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu)
-    cuda = torch.cuda.is_available()
+    cuda = args.cuda
     torch.cuda.manual_seed(1337)
 
     # 1. dataset
@@ -81,8 +80,11 @@ def main():
     val_loader = DataLoader(domain_val, batch_size=args.batch_size, shuffle=False, num_workers=2, pin_memory=True)
 
     # 2. model
-    model = DeepLab(num_classes=2, backbone='mobilenet', output_stride=args.out_stride, classmates=True).cuda()
-    t_model = DeepLab(num_classes=2, backbone='mobilenet', output_stride=args.out_stride).cuda()
+    model = DeepLab(num_classes=2, backbone='mobilenet', output_stride=args.out_stride, classmates=True)
+    t_model = DeepLab(num_classes=2, backbone='mobilenet', output_stride=args.out_stride)
+    if cuda:
+        model = model.cuda()
+        t_model = t_model.cuda()
 
     print('parameter numer:', sum([p.numel() for p in model.parameters()]))
 
