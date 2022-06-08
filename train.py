@@ -34,7 +34,7 @@ def main():
     parser.add_argument('--data-dir', default='D:\GitHubProjects\SFDA-DPL\Fundus', help='data root path')
     parser.add_argument('--out-stride', type=int, default=16, help='out-stride of deeplabv3+',)
     parser.add_argument('--gamma', type=int, default=200, help='weight of IC',)
-    parser.add_argument('--cuda', default=None, help='Enable Cuda')
+    parser.add_argument('--cuda', action='store_true', help='Enable Cuda')
     args = parser.parse_args()
 
     now = datetime.now()
